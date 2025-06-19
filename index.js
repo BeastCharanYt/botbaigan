@@ -4,27 +4,66 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 
+// ========== DISCORD BOT SETUP ==========
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds
   ],
 });
 
+// ========== EXPRESS SERVER SETUP ==========
 const app = express();
 const port = 3000;
+
 app.get('/', (req, res) => {
   const imagePath = path.join(__dirname, 'index.html');
   res.sendFile(imagePath);
 });
+
 app.listen(port, () => {
   console.log('\x1b[36m[ SERVER ]\x1b[0m', '\x1b[32m SH : http://localhost:' + port + ' ✅\x1b[0m');
 });
 
-const statusMessages = ["Listening to Hell Words"];
-const statusTypes = [ 'dnd'];
-let currentStatusIndex = 0;
-let currentTypeIndex = 0;
+// ========== RPC-LIKE BOT STATUS CONFIG ==========
+const statusMessages = [
+  { name: "music in Hell", type: ActivityType.Listening },
+  { name: "with cursed souls", type: ActivityType.Playing },
+  { name: "you suffer", type: ActivityType.Watching },
+  { name: "https://twitch.tv/hellfire", type: ActivityType.Streaming, url: "https://twitch.tv/hellfire" },
+];
 
+let currentStatusIndex = 0;
+
+function updateStatus() {
+  const status = statusMessages[currentStatusIndex];
+
+  const presenceData = {
+    activities: [{
+      name: status.name,
+      type: status.type,
+    }],
+    status: 'dnd', // Can be: 'online' | 'idle' | 'dnd'
+  };
+
+  if (status.type === ActivityType.Streaming && status.url) {
+    presenceData.activities[0].url = status.url;
+  }
+
+  client.user.setPresence(presenceData);
+
+  console.log('\x1b[33m[ STATUS ]\x1b[0m', `Updated status to: ${status.name} (${ActivityType[status.type]})`);
+
+  currentStatusIndex = (currentStatusIndex + 1) % statusMessages.length;
+}
+
+// ========== HEARTBEAT LOG ==========
+function heartbeat() {
+  setInterval(() => {
+    console.log('\x1b[35m[ HEARTBEAT ]\x1b[0m', `Bot is alive at ${new Date().toLocaleTimeString()}`);
+  }, 30000);
+}
+
+// ========== LOGIN & EVENT HANDLER ==========
 async function login() {
   try {
     await client.login(process.env.TOKEN);
@@ -37,31 +76,13 @@ async function login() {
   }
 }
 
-function updateStatus() {
-  const currentStatus = statusMessages[currentStatusIndex];
-  const currentType = statusTypes[currentTypeIndex];
-  client.user.setPresence({
-    activities: [{ name: currentStatus, type: ActivityType.Custom }],
-    status: currentType,
-  });
-  console.log('\x1b[33m[ STATUS ]\x1b[0m', `Updated status to: ${currentStatus} (${currentType})`);
-  currentStatusIndex = (currentStatusIndex + 1) % statusMessages.length;
-  currentTypeIndex = (currentTypeIndex + 1) % statusTypes.length;
-}
-
-function heartbeat() {
-  setInterval(() => {
-    console.log('\x1b[35m[ HEARTBEAT ]\x1b[0m', `Bot is alive at ${new Date().toLocaleTimeString()}`);
-  }, 30000);
-}
-
 client.once('ready', () => {
   console.log('\x1b[36m[ INFO ]\x1b[0m', `\x1b[34mPing: ${client.ws.ping} ms \x1b[0m`);
   updateStatus();
-  setInterval(updateStatus, 10000);
+  setInterval(updateStatus, 10000); // change every 10 seconds
   heartbeat();
 });
 
+// ========== START ==========
 login();
-
   
