@@ -26,10 +26,7 @@ app.listen(port, () => {
 
 // ========== RPC-LIKE BOT STATUS CONFIG ==========
 const statusMessages = [
-  { name: "music in Hell", type: ActivityType.Listening },
-  { name: "with cursed souls", type: ActivityType.Playing },
-  { name: "you suffer", type: ActivityType.Watching },
-  { name: "https://twitch.tv/hellfire", type: ActivityType.Streaming, url: "https://twitch.tv/hellfire" },
+  { name: "Nav", type: ActivityType.Streaming, url: "https://github.com/BeastCharanYt" },
 ];
 
 let currentStatusIndex = 0;
