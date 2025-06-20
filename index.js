@@ -26,7 +26,7 @@ app.listen(port, () => {
 
 // ========== RPC-LIKE BOT STATUS CONFIG ==========
 const statusMessages = [
-  { name: "Nav", type: ActivityType.Streaming, url: "https://github.com/BeastCharanYt" },
+  { name: "Nav", type: ActivityType.Streaming, url: "https://www.twitch.tv/*" },
 ];
 
 let currentStatusIndex = 0;
